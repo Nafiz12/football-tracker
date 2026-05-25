@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify, request, send_from_directory
 from database import (
     init_db, get_matches, add_match, delete_match,
@@ -77,5 +78,4 @@ def scorers():
 
 if __name__ == '__main__':
     init_db()
-    print("⚽ Football Tracker running at http://localhost:5000")
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
