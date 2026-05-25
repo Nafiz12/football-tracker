@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Football Tracker</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1d4ed8;--blue-lt:#dbeafe;--blue-dk:#1e3a8a;
+  --green:#16a34a;--green-lt:#dcfce7;
+  --red:#dc2626;--red-lt:#fee2e2;
+  --yellow:#ca8a04;--yellow-lt:#fef9c3;
+  --gray:#64748b;--border:#e2e8f0;
+  --bg:#f1f5f9;--card:#ffffff;--text:#0f172a;--sub:#64748b;
+}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Header */
+header{background:linear-gradient(135deg,#1d4ed8,#1e3a8a);color:#fff;padding:0 1.5rem;height:58px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+header .logo{font-size:1.4rem}
+header h1{font-size:1.1rem;font-weight:600}
+header .sub{font-size:.78rem;opacity:.7;margin-left:auto}
+
+/* Nav tabs */
+nav{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;gap:0}
+.tab{padding:.75rem 1.25rem;font-size:.85rem;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab:hover{color:var(--blue)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* Main */
+main{max-width:1050px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.section{display:none}.section.active{display:block}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+
+/* Grid */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.two-col{grid-template-columns:1fr}}
+
+/* Match result card */
+.match-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem}
+.match-round{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);min-width:60px}
+.match-teams{flex:1;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.team-name{font-weight:600;font-size:.9rem;flex:1}
+.team-name.away{text-align:right}
+.score-box{display:flex;align-items:center;gap:.4rem}
+.score{font-size:1.3rem;font-weight:700;min-width:24px;text-align:center}
+.score-sep{color:var(--sub);font-size:1rem}
+.match-date{font-size:.72rem;color:var(--sub);min-width:70px;text-align:right}
+.btn-del{background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;padding:.2rem .4rem;border-radius:5px;transition:color .15s}
+.btn-del:hover{color:var(--red)}
+.win{color:var(--green)}.draw{color:var(--yellow)}.loss{color:var(--red)}
+
+/* League table */
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead{background:#f8fafc}
+th{padding:.6rem .75rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);font-weight:600}
+td{padding:.6rem .75rem;border-top:1px solid var(--border)}
+tr:hover td{background:#f8fafc}
+.pos{color:var(--sub);font-weight:700;width:28px}
+.pts{font-weight:700;color:var(--blue)}
+.pos-1{border-left:3px solid gold}
+.pos-2{border-left:3px solid silver}
+.pos-3{border-left:3px solid #cd7f32}
+
+/* Scorers */
+.scorer-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.scorer-row:last-child{border-bottom:none}
+.scorer-rank{font-size:.75rem;font-weight:700;color:var(--sub);width:20px}
+.scorer-info{flex:1}
+.scorer-name{font-weight:600;font-size:.9rem}
+.scorer-team{font-size:.75rem;color:var(--sub)}
+.scorer-goals{background:var(--blue);color:#fff;border-radius:20px;padding:.15rem .65rem;font-size:.8rem;font-weight:700}
+
+/* Form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.field{display:flex;flex-direction:column;gap:.3rem}
+.field label{font-size:.75rem;font-weight:600;color:var(--sub)}
+.field input,.field select{padding:.5rem .75rem;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:inherit;background:var(--card);color:var(--text)}
+.field input:focus,.field select:focus{outline:2px solid var(--blue);border-color:transparent}
+.field.full{grid-column:1/-1}
+.btn{padding:.55rem 1.2rem;border-radius:7px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue-dk)}
+.btn-sm{padding:.3rem .75rem;font-size:.78rem}
+
+/* Stat pills */
+.stat-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.stat-pill{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.5rem .9rem;font-size:.78rem;color:var(--sub)}
+.stat-pill strong{color:var(--text);font-size:1.1rem;display:block}
+
+/* Filter row */
+.filter-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
+.filter-row select{padding:.35rem .6rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;background:var(--card)}
+
+/* Toast */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#0f172a;color:#fff;padding:.7rem 1.1rem;border-radius:8px;font-size:.85rem;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* Empty */
+.empty{text-align:center;padding:2.5rem;color:var(--sub);font-size:.9rem}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">⚽</span>
+  <h1>Football Tracker</h1>
+  <span class="sub">Track · Analyse · Win</span>
+</header>
+
+<nav>
+  <div class="tab active" data-tab="matches">Matches</div>
+  <div class="tab" data-tab="table">League Table</div>
+  <div class="tab" data-tab="scorers">Top Scorers</div>
+  <div class="tab" data-tab="add">+ Add Match</div>
+  <div class="tab" data-tab="manage">Manage</div>
+</nav>
+
+<main>
+
+  <!-- ── MATCHES ── -->
+  <div class="section active" id="tab-matches">
+    <div class="stat-row" id="match-stats"></div>
+    <div class="filter-row">
+      <label style="font-size:.8rem;color:var(--sub)">Filter by team:</label>
+      <select id="filter-team" onchange="loadMatches()">
+        <option value="">All Teams</option>
+      </select>
+    </div>
+    <div id="matches-list"></div>
+  </div>
+
+  <!-- ── LEAGUE TABLE ── -->
+  <div class="section" id="tab-table">
+    <div class="card">
+      <div class="card-title">📊 League Standings</div>
+      <table id="league-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
+            <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── TOP SCORERS ── -->
+  <div class="section" id="tab-scorers">
+    <div class="card">
+      <div class="card-title">🥇 Top Scorers</div>
+      <div id="scorers-list"></div>
+    </div>
+  </div>
+
+  <!-- ── ADD MATCH ── -->
+  <div class="section" id="tab-add">
+    <div class="card">
+      <div class="card-title">⚽ Log a Match Result</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Home Team</label>
+          <select id="a-home"></select>
+        </div>
+        <div class="field">
+          <label>Away Team</label>
+          <select id="a-away"></select>
+        </div>
+        <div class="field">
+          <label>Home Goals</label>
+          <input type="number" id="a-hgoals" min="0" value="0"/>
+        </div>
+        <div class="field">
+          <label>Away Goals</label>
+          <input type="number" id="a-agoals" min="0" value="0"/>
+        </div>
+        <div class="field">
+          <label>Match Date</label>
+          <input type="date" id="a-date"/>
+        </div>
+        <div class="field">
+          <label>Round</label>
+          <input type="text" id="a-round" placeholder="e.g. Round 4, Quarter Final"/>
+        </div>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="card-title">🎯 Goal Scorers (optional)</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Player</label>
+            <select id="s-player"><option value="">— select player —</option></select>
+          </div>
+          <div class="field">
+            <label>Goals scored</label>
+            <input type="number" id="s-goals" min="1" value="1"/>
+          </div>
+          <div class="field full">
+            <button class="btn btn-sm" onclick="addScorer()" style="width:fit-content;background:#f1f5f9;border:1px solid var(--border);color:var(--text)">+ Add scorer</button>
+          </div>
+        </div>
+        <div id="scorers-added" style="margin-top:.5rem;display:flex;flex-wrap:wrap;gap:.4rem"></div>
+      </div>
+      <div style="margin-top:1.25rem">
+        <button class="btn btn-primary" onclick="submitMatch()">Save Match</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MANAGE ── -->
+  <div class="section" id="tab-manage">
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🏟 Add Team</div>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>Team Name</label>
+          <input type="text" id="m-team" placeholder="e.g. Bayern Munich"/>
+        </div>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>City</label>
+          <input type="text" id="m-city" placeholder="e.g. Munich"/>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="submitTeam()">Add Team</button>
+      </div>
+      <div class="card">
+        <div class="card-title">👤 Add Player</div>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>Player Name</label>
+          <input type="text" id="m-player" placeholder="e.g. Erling Haaland"/>
+        </div>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>Team</label>
+          <select id="m-pteam"></select>
+        </div>
+        <div class="field" style="margin-bottom:.75rem">
+          <label>Position</label>
+          <select id="m-pos">
+            <option value="FW">Forward (FW)</option>
+            <option value="MF">Midfielder (MF)</option>
+            <option value="DF">Defender (DF)</option>
+            <option value="GK">Goalkeeper (GK)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="submitPlayer()">Add Player</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let teams = [], players = [], pendingScorers = [];
+
+// ── Init ──────────────────────────────────────────────────────
+async function init() {
+  await loadTeams();
+  await loadMatches();
+  document.getElementById('a-date').value = new Date().toISOString().split('T')[0];
+}
+
+// ── Tab switching ─────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'table')   loadTable();
+    if (tab.dataset.tab === 'scorers') loadScorers();
+  });
+});
+
+// ── Teams ─────────────────────────────────────────────────────
+async function loadTeams() {
+  const res = await fetch('/api/teams');
+  teams = await res.json();
+  const opts = teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  ['a-home','a-away','m-pteam'].forEach(id => document.getElementById(id).innerHTML = opts);
+  const filterOpts = '<option value="">All Teams</option>' +
+    teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  document.getElementById('filter-team').innerHTML = filterOpts;
+  await loadPlayers();
+}
+
+async function loadPlayers() {
+  const res = await fetch('/api/players');
+  players = await res.json();
+  const opts = '<option value="">— select player —</option>' +
+    players.map(p => `<option value="${p.id}">${p.name} (${p.team_name})</option>`).join('');
+  document.getElementById('s-player').innerHTML = opts;
+}
+
+// ── Matches ───────────────────────────────────────────────────
+async function loadMatches() {
+  const teamId = document.getElementById('filter-team').value;
+  const url = teamId ? `/api/matches?team_id=${teamId}` : '/api/matches';
+  const res = await fetch(url);
+  const matches = await res.json();
+
+  // Stats
+  const total = matches.length;
+  const goals = matches.reduce((s,m) => s + m.home_goals + m.away_goals, 0);
+  document.getElementById('match-stats').innerHTML = `
+    <div class="stat-pill"><strong>${total}</strong>Matches</div>
+    <div class="stat-pill"><strong>${goals}</strong>Total Goals</div>
+    <div class="stat-pill"><strong>${total ? (goals/total).toFixed(1) : 0}</strong>Goals/Match</div>
+  `;
+
+  const list = document.getElementById('matches-list');
+  if (!matches.length) { list.innerHTML = '<div class="empty">No matches found.</div>'; return; }
+
+  list.innerHTML = matches.map(m => {
+    const hwin = m.home_goals > m.away_goals;
+    const awin = m.away_goals > m.home_goals;
+    const draw = m.home_goals === m.away_goals;
+    return `
+    <div class="match-card">
+      <span class="match-round">${esc(m.round)}</span>
+      <div class="match-teams">
+        <span class="team-name ${hwin?'win':draw?'draw':'loss'}">${esc(m.home_team)}</span>
+        <div class="score-box">
+          <span class="score ${hwin?'win':draw?'draw':'loss'}">${m.home_goals}</span>
+          <span class="score-sep">–</span>
+          <span class="score ${awin?'win':draw?'draw':'loss'}">${m.away_goals}</span>
+        </div>
+        <span class="team-name away ${awin?'win':draw?'draw':'loss'}">${esc(m.away_team)}</span>
+      </div>
+      <span class="match-date">${m.match_date}</span>
+      <button class="btn-del" onclick="delMatch(${m.id})" title="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function delMatch(id) {
+  if (!confirm('Delete this match?')) return;
+  await fetch(`/api/matches/${id}`, { method: 'DELETE' });
+  showToast('Match deleted');
+  loadMatches();
+  loadTable();
+}
+
+// ── League Table ──────────────────────────────────────────────
+async function loadTable() {
+  const res = await fetch('/api/table');
+  const rows = await res.json();
+  const posClass = ['pos-1','pos-2','pos-3'];
+  document.getElementById('table-body').innerHTML = rows.map((r,i) => `
+    <tr class="${posClass[i]||''}">
+      <td class="pos">${i+1}</td>
+      <td><strong>${esc(r.name)}</strong> <span style="color:var(--sub);font-size:.75rem">${esc(r.city)}</span></td>
+      <td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td>
+      <td>${r.gf}</td><td>${r.ga}</td>
+      <td style="color:${r.gd>0?'var(--green)':r.gd<0?'var(--red)':'inherit'}">${r.gd>0?'+':''}${r.gd}</td>
+      <td class="pts">${r.points}</td>
+    </tr>`).join('');
+}
+
+// ── Top Scorers ───────────────────────────────────────────────
+async function loadScorers() {
+  const res = await fetch('/api/scorers');
+  const data = await res.json();
+  const medals = ['🥇','🥈','🥉'];
+  document.getElementById('scorers-list').innerHTML = data.map((s,i) => `
+    <div class="scorer-row">
+      <span class="scorer-rank">${medals[i]||i+1}</span>
+      <div class="scorer-info">
+        <div class="scorer-name">${esc(s.player)}</div>
+        <div class="scorer-team">${esc(s.team)} · ${s.position}</div>
+      </div>
+      <span class="scorer-goals">${s.goals} ⚽</span>
+    </div>`).join('') || '<div class="empty">No goal data yet.</div>';
+}
+
+// ── Add Match ─────────────────────────────────────────────────
+function addScorer() {
+  const pid = document.getElementById('s-player').value;
+  const goals = parseInt(document.getElementById('s-goals').value) || 1;
+  if (!pid) { showToast('Select a player'); return; }
+  const player = players.find(p => p.id == pid);
+  if (pendingScorers.find(s => s.player_id == pid)) { showToast('Already added'); return; }
+  pendingScorers.push({ player_id: pid, goals, name: player.name });
+  renderPendingScorers();
+}
+
+function renderPendingScorers() {
+  document.getElementById('scorers-added').innerHTML = pendingScorers.map((s,i) =>
+    `<span style="background:#f1f5f9;border:1px solid var(--border);border-radius:6px;padding:.2rem .6rem;font-size:.78rem;display:flex;align-items:center;gap:.4rem">
+      ${esc(s.name)} ⚽×${s.goals}
+      <button onclick="removeScorer(${i})" style="background:none;border:none;cursor:pointer;color:var(--red);font-size:.85rem">✕</button>
+    </span>`
+  ).join('');
+}
+
+function removeScorer(i) { pendingScorers.splice(i,1); renderPendingScorers(); }
+
+async function submitMatch() {
+  const home = document.getElementById('a-home').value;
+  const away = document.getElementById('a-away').value;
+  const hg   = document.getElementById('a-hgoals').value;
+  const ag   = document.getElementById('a-agoals').value;
+  const date = document.getElementById('a-date').value;
+  const round = document.getElementById('a-round').value.trim();
+  if (!round) { showToast('Enter a round name'); return; }
+  if (home === away) { showToast('Teams must be different'); return; }
+  const res = await fetch('/api/matches', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ home_team_id:+home, away_team_id:+away,
+      home_goals:+hg, away_goals:+ag, match_date:date, round, scorers:pendingScorers })
+  });
+  if (res.ok) {
+    showToast('Match saved! ⚽');
+    pendingScorers = []; renderPendingScorers();
+    document.getElementById('a-hgoals').value = 0;
+    document.getElementById('a-agoals').value = 0;
+    document.getElementById('a-round').value = '';
+  }
+}
+
+// ── Manage ────────────────────────────────────────────────────
+async function submitTeam() {
+  const name = document.getElementById('m-team').value.trim();
+  const city = document.getElementById('m-city').value.trim();
+  if (!name) { showToast('Enter team name'); return; }
+  const res = await fetch('/api/teams', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name, city })
+  });
+  if (res.ok) {
+    showToast('Team added!');
+    document.getElementById('m-team').value = '';
+    document.getElementById('m-city').value = '';
+    await loadTeams();
+  }
+}
+
+async function submitPlayer() {
+  const name    = document.getElementById('m-player').value.trim();
+  const team_id = document.getElementById('m-pteam').value;
+  const position= document.getElementById('m-pos').value;
+  if (!name) { showToast('Enter player name'); return; }
+  const res = await fetch('/api/players', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ name, team_id:+team_id, position })
+  });
+  if (res.ok) {
+    showToast('Player added!');
+    document.getElementById('m-player').value = '';
+    await loadPlayers();
+  }
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>
