@@ -8,6 +8,10 @@ from database import (
 
 app = Flask(__name__, static_folder='static')
 
+# Init DB on startup (works with both gunicorn and direct run)
+with app.app_context():
+    init_db()
+
 # ── Frontend ──────────────────────────────────────────────────
 @app.route('/')
 def index():
@@ -54,7 +58,7 @@ def create_match():
         return jsonify({'error': 'Missing fields'}), 400
     if data['home_team_id'] == data['away_team_id']:
         return jsonify({'error': 'Teams must be different'}), 400
-    scorers = data.get('scorers', [])  # list of {player_id, goals}
+    scorers = data.get('scorers', [])
     match = add_match(
         data['home_team_id'], data['away_team_id'],
         int(data['home_goals']), int(data['away_goals']),
@@ -77,5 +81,4 @@ def scorers():
     return jsonify(get_top_scorers())
 
 if __name__ == '__main__':
-    init_db()
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
