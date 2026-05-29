@@ -11,19 +11,28 @@ def get_conn():
 
 def init_db():
     conn = get_conn()
+
+    # Drop and recreate every startup so Railway always has fresh seed data
     conn.executescript('''
-        CREATE TABLE IF NOT EXISTS teams (
+        PRAGMA foreign_keys = OFF;
+        DROP TABLE IF EXISTS goals;
+        DROP TABLE IF EXISTS matches;
+        DROP TABLE IF EXISTS players;
+        DROP TABLE IF EXISTS teams;
+        PRAGMA foreign_keys = ON;
+
+        CREATE TABLE teams (
             id      INTEGER PRIMARY KEY AUTOINCREMENT,
             name    TEXT NOT NULL UNIQUE,
             city    TEXT DEFAULT ''
         );
-        CREATE TABLE IF NOT EXISTS players (
+        CREATE TABLE players (
             id       INTEGER PRIMARY KEY AUTOINCREMENT,
             name     TEXT NOT NULL,
             team_id  INTEGER NOT NULL REFERENCES teams(id),
             position TEXT DEFAULT 'FW'
         );
-        CREATE TABLE IF NOT EXISTS matches (
+        CREATE TABLE matches (
             id           INTEGER PRIMARY KEY AUTOINCREMENT,
             home_team_id INTEGER NOT NULL REFERENCES teams(id),
             away_team_id INTEGER NOT NULL REFERENCES teams(id),
@@ -33,7 +42,7 @@ def init_db():
             round        TEXT NOT NULL,
             created_at   TEXT NOT NULL
         );
-        CREATE TABLE IF NOT EXISTS goals (
+        CREATE TABLE goals (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,
             match_id   INTEGER NOT NULL REFERENCES matches(id) ON DELETE CASCADE,
             player_id  INTEGER NOT NULL REFERENCES players(id),
@@ -41,135 +50,103 @@ def init_db():
         );
     ''')
 
-    count = conn.execute('SELECT COUNT(*) FROM teams').fetchone()[0]
-    if count == 0:
-        # Real EPL 2025/26 teams
-        teams = [
-            ('Arsenal',                  'London'),
-            ('Manchester City',          'Manchester'),
-            ('Manchester United',        'Manchester'),
-            ('Aston Villa',              'Birmingham'),
-            ('Liverpool',                'Liverpool'),
-            ('AFC Bournemouth',          'Bournemouth'),
-            ('Sunderland',               'Sunderland'),
-            ('Brighton & Hove Albion',   'Brighton'),
-            ('Brentford',                'London'),
-            ('Chelsea',                  'London'),
-            ('Fulham',                   'London'),
-            ('Newcastle United',         'Newcastle'),
-            ('Everton',                  'Liverpool'),
-            ('Leeds United',             'Leeds'),
-            ('Crystal Palace',           'London'),
-            ('Nottingham Forest',        'Nottingham'),
-            ('Tottenham Hotspur',        'London'),
-            ('West Ham United',          'London'),
-            ('Burnley',                  'Burnley'),
-            ('Wolverhampton Wanderers',  'Wolverhampton'),
-        ]
-        for name, city in teams:
-            conn.execute('INSERT INTO teams (name, city) VALUES (?,?)', (name, city))
+    # Real EPL 2025/26 teams
+    teams = [
+        ('Arsenal',                  'London'),
+        ('Manchester City',          'Manchester'),
+        ('Manchester United',        'Manchester'),
+        ('Aston Villa',              'Birmingham'),
+        ('Liverpool',                'Liverpool'),
+        ('AFC Bournemouth',          'Bournemouth'),
+        ('Sunderland',               'Sunderland'),
+        ('Brighton & Hove Albion',   'Brighton'),
+        ('Brentford',                'London'),
+        ('Chelsea',                  'London'),
+        ('Fulham',                   'London'),
+        ('Newcastle United',         'Newcastle'),
+        ('Everton',                  'Liverpool'),
+        ('Leeds United',             'Leeds'),
+        ('Crystal Palace',           'London'),
+        ('Nottingham Forest',        'Nottingham'),
+        ('Tottenham Hotspur',        'London'),
+        ('West Ham United',          'London'),
+        ('Burnley',                  'Burnley'),
+        ('Wolverhampton Wanderers',  'Wolverhampton'),
+    ]
+    for name, city in teams:
+        conn.execute('INSERT INTO teams (name, city) VALUES (?,?)', (name, city))
 
-        # Key players per team
-        players = [
-            # Arsenal (id=1)
-            ('Saka',        1,'FW'),('Odegaard',    1,'MF'),('Havertz',     1,'FW'),
-            ('White',       1,'DF'),('Raya',         1,'GK'),
-            # Man City (id=2)
-            ('Haaland',     2,'FW'),('De Bruyne',    2,'MF'),('Foden',       2,'MF'),
-            ('Dias',        2,'DF'),('Ederson',      2,'GK'),
-            # Man United (id=3)
-            ('Rashford',    3,'FW'),('Bruno Fernandes',3,'MF'),('Hojlund',   3,'FW'),
-            ('Maguire',     3,'DF'),('Onana',        3,'GK'),
-            # Aston Villa (id=4)
-            ('Watkins',     4,'FW'),('McGinn',       4,'MF'),('Bailey',      4,'FW'),
-            ('Konsa',       4,'DF'),('Martinez',     4,'GK'),
-            # Liverpool (id=5)
-            ('Salah',       5,'FW'),('Nunez',        5,'FW'),('Mac Allister',5,'MF'),
-            ('Van Dijk',    5,'DF'),('Alisson',      5,'GK'),
-            # Bournemouth (id=6)
-            ('Solanke',     6,'FW'),('Christie',     6,'MF'),('Kluivert',   6,'FW'),
-            # Sunderland (id=7)
-            ('Stewart',     7,'FW'),('Neil',         7,'MF'),
-            # Brighton (id=8)
-            ('Mitoma',      8,'FW'),('Gross',        8,'MF'),('Welbeck',    8,'FW'),
-            # Brentford (id=9)
-            ('Toney',       9,'FW'),('Mbeumo',       9,'FW'),('Jensen',     9,'MF'),
-            # Chelsea (id=10)
-            ('Palmer',     10,'MF'),('Jackson',     10,'FW'),('Gallagher',  10,'MF'),
-            # Fulham (id=11)
-            ('Jimenez',    11,'FW'),('Andreas',     11,'MF'),
-            # Newcastle (id=12)
-            ('Isak',       12,'FW'),('Gordon',      12,'FW'),('Bruno G',    12,'MF'),
-            # Everton (id=13)
-            ('Calvert-Lewin',13,'FW'),('Doucoure',  13,'MF'),
-            # Leeds (id=14)
-            ('Bamford',    14,'FW'),('Gnonto',      14,'FW'),
-            # Crystal Palace (id=15)
-            ('Olise',      15,'FW'),('Eze',         15,'MF'),
-            # Nottingham Forest (id=16)
-            ('Awoniyi',    16,'FW'),('Hudson-Odoi', 16,'FW'),
-            # Tottenham (id=17)
-            ('Son',        17,'FW'),('Kane',        17,'FW'),('Maddison',   17,'MF'),
-            # West Ham (id=18)
-            ('Antonio',    18,'FW'),('Ward-Prowse', 18,'MF'),
-            # Burnley (id=19)
-            ('Rodriguez',  19,'FW'),('Benson',      19,'MF'),
-            # Wolves (id=20)
-            ('Hwang',      20,'FW'),('Neves',       20,'MF'),
-        ]
-        for name, tid, pos in players:
-            conn.execute('INSERT INTO players (name, team_id, position) VALUES (?,?,?)', (name, tid, pos))
+    players = [
+        ('Saka',        1,'FW'),('Odegaard',    1,'MF'),('Havertz',     1,'FW'),
+        ('White',       1,'DF'),('Raya',         1,'GK'),
+        ('Haaland',     2,'FW'),('De Bruyne',    2,'MF'),('Foden',       2,'MF'),
+        ('Dias',        2,'DF'),('Ederson',      2,'GK'),
+        ('Rashford',    3,'FW'),('Bruno Fernandes',3,'MF'),('Hojlund',   3,'FW'),
+        ('Maguire',     3,'DF'),('Onana',        3,'GK'),
+        ('Watkins',     4,'FW'),('McGinn',       4,'MF'),('Bailey',      4,'FW'),
+        ('Konsa',       4,'DF'),('Martinez',     4,'GK'),
+        ('Salah',       5,'FW'),('Nunez',        5,'FW'),('Mac Allister',5,'MF'),
+        ('Van Dijk',    5,'DF'),('Alisson',      5,'GK'),
+        ('Solanke',     6,'FW'),('Christie',     6,'MF'),('Kluivert',   6,'FW'),
+        ('Stewart',     7,'FW'),('Neil',         7,'MF'),
+        ('Mitoma',      8,'FW'),('Gross',        8,'MF'),('Welbeck',    8,'FW'),
+        ('Toney',       9,'FW'),('Mbeumo',       9,'FW'),('Jensen',     9,'MF'),
+        ('Palmer',     10,'MF'),('Jackson',     10,'FW'),('Gallagher',  10,'MF'),
+        ('Jimenez',    11,'FW'),('Andreas',     11,'MF'),
+        ('Isak',       12,'FW'),('Gordon',      12,'FW'),('Bruno G',    12,'MF'),
+        ('Calvert-Lewin',13,'FW'),('Doucoure',  13,'MF'),
+        ('Bamford',    14,'FW'),('Gnonto',      14,'FW'),
+        ('Olise',      15,'FW'),('Eze',         15,'MF'),
+        ('Awoniyi',    16,'FW'),('Hudson-Odoi', 16,'FW'),
+        ('Son',        17,'FW'),('Kane',        17,'FW'),('Maddison',   17,'MF'),
+        ('Antonio',    18,'FW'),('Ward-Prowse', 18,'MF'),
+        ('Rodriguez',  19,'FW'),('Benson',      19,'MF'),
+        ('Hwang',      20,'FW'),('Neves',       20,'MF'),
+    ]
+    for name, tid, pos in players:
+        conn.execute('INSERT INTO players (name, team_id, position) VALUES (?,?,?)', (name, tid, pos))
 
-        # Today's real final day results (May 24, 2026)
-        final_day = [
-            (8,  3,  0, 3, '2026-05-24', 'Matchday 38'),  # Brighton 0-3 Man Utd
-            (19, 20, 1, 1, '2026-05-24', 'Matchday 38'),  # Burnley 1-1 Wolves
-            (15, 1,  1, 2, '2026-05-24', 'Matchday 38'),  # Crystal Palace 1-2 Arsenal
-            (11, 12, 2, 0, '2026-05-24', 'Matchday 38'),  # Fulham 2-0 Newcastle
-            (5,  9,  1, 1, '2026-05-24', 'Matchday 38'),  # Liverpool 1-1 Brentford
-            (2,  4,  1, 2, '2026-05-24', 'Matchday 38'),  # Man City 1-2 Aston Villa
-            (16, 6,  1, 1, '2026-05-24', 'Matchday 38'),  # Nottm Forest 1-1 Bournemouth
-            (7,  10, 2, 1, '2026-05-24', 'Matchday 38'),  # Sunderland 2-1 Chelsea
-            (17, 13, 1, 0, '2026-05-24', 'Matchday 38'),  # Tottenham 1-0 Everton
-            (18, 14, 3, 0, '2026-05-24', 'Matchday 38'),  # West Ham 3-0 Leeds
-        ]
-        # Earlier matchdays sample
-        earlier = [
-            (1,  2,  2, 1, '2026-05-17', 'Matchday 37'),  # Arsenal 2-1 Man City
-            (5,  1,  0, 1, '2026-05-10', 'Matchday 36'),  # Liverpool 0-1 Arsenal
-            (2,  5,  3, 1, '2026-05-03', 'Matchday 35'),  # Man City 3-1 Liverpool
-            (1,  3,  3, 0, '2026-04-26', 'Matchday 34'),  # Arsenal 3-0 Man Utd
-            (10, 1,  1, 2, '2026-04-19', 'Matchday 33'),  # Chelsea 1-2 Arsenal
-            (2,  3,  2, 0, '2026-04-12', 'Matchday 32'),  # Man City 2-0 Man Utd
-        ]
+    final_day = [
+        (8,  3,  0, 3, '2026-05-24', 'Matchday 38'),
+        (19, 20, 1, 1, '2026-05-24', 'Matchday 38'),
+        (15, 1,  1, 2, '2026-05-24', 'Matchday 38'),
+        (11, 12, 2, 0, '2026-05-24', 'Matchday 38'),
+        (5,  9,  1, 1, '2026-05-24', 'Matchday 38'),
+        (2,  4,  1, 2, '2026-05-24', 'Matchday 38'),
+        (16, 6,  1, 1, '2026-05-24', 'Matchday 38'),
+        (7,  10, 2, 1, '2026-05-24', 'Matchday 38'),
+        (17, 13, 1, 0, '2026-05-24', 'Matchday 38'),
+        (18, 14, 3, 0, '2026-05-24', 'Matchday 38'),
+    ]
+    earlier = [
+        (1,  2,  2, 1, '2026-05-17', 'Matchday 37'),
+        (5,  1,  0, 1, '2026-05-10', 'Matchday 36'),
+        (2,  5,  3, 1, '2026-05-03', 'Matchday 35'),
+        (1,  3,  3, 0, '2026-04-26', 'Matchday 34'),
+        (10, 1,  1, 2, '2026-04-19', 'Matchday 33'),
+        (2,  3,  2, 0, '2026-04-12', 'Matchday 32'),
+    ]
 
-        all_matches = final_day + earlier
-        match_ids = []
-        for hid, aid, hg, ag, date, rnd in all_matches:
-            cur = conn.execute(
-                'INSERT INTO matches (home_team_id,away_team_id,home_goals,away_goals,match_date,round,created_at) VALUES (?,?,?,?,?,?,?)',
-                (hid, aid, hg, ag, date, rnd, datetime.now().strftime('%Y-%m-%d %H:%M'))
-            )
-            match_ids.append(cur.lastrowid)
+    match_ids = []
+    for hid, aid, hg, ag, date, rnd in final_day + earlier:
+        cur = conn.execute(
+            'INSERT INTO matches (home_team_id,away_team_id,home_goals,away_goals,match_date,round,created_at) VALUES (?,?,?,?,?,?,?)',
+            (hid, aid, hg, ag, date, rnd, datetime.now().strftime('%Y-%m-%d %H:%M'))
+        )
+        match_ids.append(cur.lastrowid)
 
-        # Seed some goal scorers for top matches
-        goal_seeds = [
-            # Crystal Palace 1-2 Arsenal: Saka x2, Olise
-            (match_ids[2], 1, 2), (match_ids[2], 15*5-4, 1),
-            # Man Utd 3-0 Brighton: Rashford, Hojlund x2
-            (match_ids[0], 11, 1), (match_ids[0], 13, 2),
-            # Arsenal 2-1 Man City (MD37): Saka, Havertz, Haaland
-            (match_ids[10], 1, 1), (match_ids[10], 3, 1), (match_ids[10], 6, 1),
-            # Man City 3-1 Liverpool: Haaland x2, De Bruyne, Salah
-            (match_ids[12], 6, 2), (match_ids[12], 7, 1), (match_ids[12], 21, 1),
-            # Arsenal 3-0 Man Utd: Saka, Havertz x2
-            (match_ids[13], 1, 1), (match_ids[13], 3, 2),
-        ]
-        for mid, pid, g in goal_seeds:
-            try:
-                conn.execute('INSERT INTO goals (match_id, player_id, goals) VALUES (?,?,?)', (mid, pid, g))
-            except:
-                pass
+    goal_seeds = [
+        (match_ids[2],  1, 2), (match_ids[2],  51, 1),
+        (match_ids[0],  11, 1),(match_ids[0],  13, 2),
+        (match_ids[10], 1, 1), (match_ids[10], 3, 1), (match_ids[10], 6, 1),
+        (match_ids[12], 6, 2), (match_ids[12], 7, 1),
+        (match_ids[13], 1, 1), (match_ids[13], 3, 2),
+    ]
+    for mid, pid, g in goal_seeds:
+        try:
+            conn.execute('INSERT INTO goals (match_id, player_id, goals) VALUES (?,?,?)', (mid, pid, g))
+        except:
+            pass
 
     conn.commit()
     conn.close()
