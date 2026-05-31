@@ -1,7 +1,8 @@
 import sqlite3
+import os
 from datetime import datetime
 
-DB = 'football.db'
+DB = os.environ.get('DATABASE', 'football.db')
 
 def get_conn():
     conn = sqlite3.connect(DB)
