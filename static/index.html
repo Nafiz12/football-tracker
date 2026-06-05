@@ -17,23 +17,24 @@
 body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
 /* Header */
-header{background:linear-gradient(135deg,#1d4ed8,#1e3a8a);color:#fff;padding:0 1.5rem;height:58px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
-header .logo{font-size:1.4rem}
-header h1{font-size:1.1rem;font-weight:600}
-header .sub{font-size:.78rem;opacity:.7;margin-left:auto}
+header{background:linear-gradient(135deg,#1d4ed8,#1e3a8a);color:#fff;padding:0 1rem;height:52px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+header .logo{font-size:1.3rem;flex-shrink:0}
+header h1{font-size:1rem;font-weight:600;white-space:nowrap}
+header .sub{font-size:.72rem;opacity:.7;margin-left:auto;white-space:nowrap}
 
-/* Nav tabs */
-nav{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;gap:0}
-.tab{padding:.75rem 1.25rem;font-size:.85rem;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+/* Nav tabs - scrollable on mobile */
+nav{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.tab{padding:.7rem 1rem;font-size:.82rem;font-weight:500;color:var(--sub);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .tab:hover{color:var(--blue)}
 .tab.active{color:var(--blue);border-bottom-color:var(--blue)}
 
 /* Main */
-main{max-width:1050px;margin:0 auto;padding:1.5rem 1rem 3rem}
+main{max-width:1050px;margin:0 auto;padding:1rem .75rem 3rem}
 .section{display:none}.section.active{display:block}
 
 /* Cards */
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1rem}
 .card-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
 
 /* Grid */
@@ -41,26 +42,27 @@ main{max-width:1050px;margin:0 auto;padding:1.5rem 1rem 3rem}
 @media(max-width:640px){.two-col{grid-template-columns:1fr}}
 
 /* Match result card */
-.match-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.75rem}
-.match-round{font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);min-width:60px}
-.match-teams{flex:1;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
-.team-name{font-weight:600;font-size:.9rem;flex:1}
+.match-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:.75rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem}
+.match-round{font-size:.65rem;text-transform:uppercase;letter-spacing:.4px;color:var(--sub);min-width:52px;flex-shrink:0}
+.match-teams{flex:1;display:flex;align-items:center;justify-content:space-between;gap:.4rem;min-width:0}
+.team-name{font-weight:600;font-size:.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .team-name.away{text-align:right}
-.score-box{display:flex;align-items:center;gap:.4rem}
-.score{font-size:1.3rem;font-weight:700;min-width:24px;text-align:center}
-.score-sep{color:var(--sub);font-size:1rem}
-.match-date{font-size:.72rem;color:var(--sub);min-width:70px;text-align:right}
-.btn-del{background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;padding:.2rem .4rem;border-radius:5px;transition:color .15s}
+.score-box{display:flex;align-items:center;gap:.3rem;flex-shrink:0}
+.score{font-size:1.15rem;font-weight:700;min-width:20px;text-align:center}
+.score-sep{color:var(--sub);font-size:.9rem}
+.match-date{font-size:.65rem;color:var(--sub);flex-shrink:0;white-space:nowrap}
+.btn-del{background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;padding:.2rem .3rem;border-radius:5px;flex-shrink:0}
 .btn-del:hover{color:var(--red)}
 .win{color:var(--green)}.draw{color:var(--yellow)}.loss{color:var(--red)}
 
-/* League table */
-table{width:100%;border-collapse:collapse;font-size:.85rem}
+/* League table - scrollable on mobile */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:480px}
 thead{background:#f8fafc}
-th{padding:.6rem .75rem;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;color:var(--sub);font-weight:600}
-td{padding:.6rem .75rem;border-top:1px solid var(--border)}
+th{padding:.55rem .6rem;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.4px;color:var(--sub);font-weight:600;white-space:nowrap}
+td{padding:.55rem .6rem;border-top:1px solid var(--border)}
 tr:hover td{background:#f8fafc}
-.pos{color:var(--sub);font-weight:700;width:28px}
+.pos{color:var(--sub);font-weight:700;width:24px}
 .pts{font-weight:700;color:var(--blue)}
 .pos-1{border-left:3px solid gold}
 .pos-2{border-left:3px solid silver}
@@ -69,17 +71,18 @@ tr:hover td{background:#f8fafc}
 /* Scorers */
 .scorer-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--border)}
 .scorer-row:last-child{border-bottom:none}
-.scorer-rank{font-size:.75rem;font-weight:700;color:var(--sub);width:20px}
-.scorer-info{flex:1}
-.scorer-name{font-weight:600;font-size:.9rem}
-.scorer-team{font-size:.75rem;color:var(--sub)}
-.scorer-goals{background:var(--blue);color:#fff;border-radius:20px;padding:.15rem .65rem;font-size:.8rem;font-weight:700}
+.scorer-rank{font-size:.75rem;font-weight:700;color:var(--sub);width:20px;flex-shrink:0}
+.scorer-info{flex:1;min-width:0}
+.scorer-name{font-weight:600;font-size:.88rem}
+.scorer-team{font-size:.72rem;color:var(--sub)}
+.scorer-goals{background:var(--blue);color:#fff;border-radius:20px;padding:.15rem .65rem;font-size:.8rem;font-weight:700;flex-shrink:0}
 
 /* Form */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+@media(max-width:480px){.form-grid{grid-template-columns:1fr}}
 .field{display:flex;flex-direction:column;gap:.3rem}
 .field label{font-size:.75rem;font-weight:600;color:var(--sub)}
-.field input,.field select{padding:.5rem .75rem;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:inherit;background:var(--card);color:var(--text)}
+.field input,.field select{padding:.5rem .75rem;border:1.5px solid var(--border);border-radius:7px;font-size:.88rem;font-family:inherit;background:var(--card);color:var(--text);width:100%}
 .field input:focus,.field select:focus{outline:2px solid var(--blue);border-color:transparent}
 .field.full{grid-column:1/-1}
 .btn{padding:.55rem 1.2rem;border-radius:7px;font-size:.88rem;font-weight:600;cursor:pointer;border:none;transition:all .15s}
@@ -87,16 +90,17 @@ tr:hover td{background:#f8fafc}
 .btn-sm{padding:.3rem .75rem;font-size:.78rem}
 
 /* Stat pills */
-.stat-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.stat-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
 .stat-pill{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.5rem .9rem;font-size:.78rem;color:var(--sub)}
 .stat-pill strong{color:var(--text);font-size:1.1rem;display:block}
 
 /* Filter row */
 .filter-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center}
-.filter-row select{padding:.35rem .6rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;background:var(--card)}
+.filter-row select{padding:.35rem .6rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;background:var(--card);max-width:100%}
 
 /* Toast */
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#0f172a;color:#fff;padding:.7rem 1.1rem;border-radius:8px;font-size:.85rem;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999}
+.toast{position:fixed;bottom:1.5rem;right:1rem;left:1rem;background:#0f172a;color:#fff;padding:.7rem 1.1rem;border-radius:8px;font-size:.85rem;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;text-align:center}
+@media(min-width:480px){.toast{left:auto;right:1.5rem;max-width:300px}}
 .toast.show{opacity:1;transform:translateY(0)}
 
 /* Empty */
@@ -137,15 +141,17 @@ tr:hover td{background:#f8fafc}
   <div class="section" id="tab-table">
     <div class="card">
       <div class="card-title">📊 League Standings</div>
-      <table id="league-table">
-        <thead>
-          <tr>
-            <th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
-            <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
-          </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
+      <div class="table-wrap">
+        <table id="league-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th>
+              <th>GF</th><th>GA</th><th>GD</th><th>Pts</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -184,7 +190,7 @@ tr:hover td{background:#f8fafc}
         </div>
         <div class="field">
           <label>Round</label>
-          <input type="text" id="a-round" placeholder="e.g. Round 4, Quarter Final"/>
+          <input type="text" id="a-round" placeholder="e.g. Round 4"/>
         </div>
       </div>
       <div style="margin-top:1rem">
@@ -256,14 +262,12 @@ tr:hover td{background:#f8fafc}
 <script>
 let teams = [], players = [], pendingScorers = [];
 
-// ── Init ──────────────────────────────────────────────────────
 async function init() {
   await loadTeams();
   await loadMatches();
   document.getElementById('a-date').value = new Date().toISOString().split('T')[0];
 }
 
-// ── Tab switching ─────────────────────────────────────────────
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -275,7 +279,6 @@ document.querySelectorAll('.tab').forEach(tab => {
   });
 });
 
-// ── Teams ─────────────────────────────────────────────────────
 async function loadTeams() {
   const res = await fetch('/api/teams');
   teams = await res.json();
@@ -295,14 +298,11 @@ async function loadPlayers() {
   document.getElementById('s-player').innerHTML = opts;
 }
 
-// ── Matches ───────────────────────────────────────────────────
 async function loadMatches() {
   const teamId = document.getElementById('filter-team').value;
   const url = teamId ? `/api/matches?team_id=${teamId}` : '/api/matches';
   const res = await fetch(url);
   const matches = await res.json();
-
-  // Stats
   const total = matches.length;
   const goals = matches.reduce((s,m) => s + m.home_goals + m.away_goals, 0);
   document.getElementById('match-stats').innerHTML = `
@@ -310,10 +310,8 @@ async function loadMatches() {
     <div class="stat-pill"><strong>${goals}</strong>Total Goals</div>
     <div class="stat-pill"><strong>${total ? (goals/total).toFixed(1) : 0}</strong>Goals/Match</div>
   `;
-
   const list = document.getElementById('matches-list');
   if (!matches.length) { list.innerHTML = '<div class="empty">No matches found.</div>'; return; }
-
   list.innerHTML = matches.map(m => {
     const hwin = m.home_goals > m.away_goals;
     const awin = m.away_goals > m.home_goals;
@@ -341,10 +339,8 @@ async function delMatch(id) {
   await fetch(`/api/matches/${id}`, { method: 'DELETE' });
   showToast('Match deleted');
   loadMatches();
-  loadTable();
 }
 
-// ── League Table ──────────────────────────────────────────────
 async function loadTable() {
   const res = await fetch('/api/table');
   const rows = await res.json();
@@ -352,7 +348,7 @@ async function loadTable() {
   document.getElementById('table-body').innerHTML = rows.map((r,i) => `
     <tr class="${posClass[i]||''}">
       <td class="pos">${i+1}</td>
-      <td><strong>${esc(r.name)}</strong> <span style="color:var(--sub);font-size:.75rem">${esc(r.city)}</span></td>
+      <td><strong>${esc(r.name)}</strong></td>
       <td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td>
       <td>${r.gf}</td><td>${r.ga}</td>
       <td style="color:${r.gd>0?'var(--green)':r.gd<0?'var(--red)':'inherit'}">${r.gd>0?'+':''}${r.gd}</td>
@@ -360,7 +356,6 @@ async function loadTable() {
     </tr>`).join('');
 }
 
-// ── Top Scorers ───────────────────────────────────────────────
 async function loadScorers() {
   const res = await fetch('/api/scorers');
   const data = await res.json();
@@ -376,7 +371,6 @@ async function loadScorers() {
     </div>`).join('') || '<div class="empty">No goal data yet.</div>';
 }
 
-// ── Add Match ─────────────────────────────────────────────────
 function addScorer() {
   const pid = document.getElementById('s-player').value;
   const goals = parseInt(document.getElementById('s-goals').value) || 1;
@@ -421,7 +415,6 @@ async function submitMatch() {
   }
 }
 
-// ── Manage ────────────────────────────────────────────────────
 async function submitTeam() {
   const name = document.getElementById('m-team').value.trim();
   const city = document.getElementById('m-city').value.trim();
@@ -454,7 +447,6 @@ async function submitPlayer() {
   }
 }
 
-// ── Helpers ───────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
